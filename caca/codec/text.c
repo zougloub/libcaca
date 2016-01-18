@@ -509,6 +509,9 @@ void *_export_utf8(caca_canvas_t const *cv, size_t *bytes, int cr)
     *bytes = (cv->height * 9) + (cv->width * cv->height * 23);
     cur = data = malloc(*bytes);
 
+    uint32_t zattr = cv->attrs[0];
+    uint32_t zchar = cv->chars[0];
+
     for(y = 0; y < cv->height; y++)
     {
         uint32_t *lineattr = cv->attrs + y * cv->width;
@@ -528,6 +531,12 @@ void *_export_utf8(caca_canvas_t const *cv, size_t *bytes, int cr)
 
             ansifg = caca_attr_to_ansi_fg(attr);
             ansibg = caca_attr_to_ansi_bg(attr);
+
+            if (attr != zattr) {
+                if (ansifg == 0x20) {
+                    ansifg = ansibg;
+                }
+            }
 
             fg = ansifg < 0x10 ? palette[ansifg] : 0x10;
             bg = ansibg < 0x10 ? palette[ansibg] : 0x10;
